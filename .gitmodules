@@ -1,0 +1,3 @@
+[submodule "Capture2Text"]
+	path = Capture2Text
+	url = https://github.com/GSam/Capture2Text.git
