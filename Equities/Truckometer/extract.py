@@ -40,3 +40,4 @@ for f in reversed(sorted(files)):
 
     # extract using convert ... pdf[3] image.png -crop 600x400+0x600
     # capture2text_cli ... extract output
+    # pdftotext ANZ-Truckometer-20180411.pdf  -f 3 -l 3 -raw
