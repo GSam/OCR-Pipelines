@@ -6,4 +6,4 @@ sudo apt-get install -y libleptonica-dev
 ./build-capture2text.sh
 
 # Truckometer dependencies
-sudo apt-get install -y python-lxml
+sudo apt-get install -y python-lxml python-requests
