@@ -37,3 +37,6 @@ for f in reversed(sorted(files)):
         break
 
     num_to_parse -= 1
+
+    # extract using convert ... pdf[3] image.png -crop 600x400+0x600
+    # capture2text_cli ... extract output
