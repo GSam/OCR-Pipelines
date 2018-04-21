@@ -1,5 +1,5 @@
-sudo apt-get install libtesseract-dev
-sudo apt-get install qtbase5-dev
-sudo apt-get install libleptonica-dev
+sudo apt-get install -y libtesseract-dev
+sudo apt-get install -y qtbase5-dev
+sudo apt-get install -y libleptonica-dev
 
 ./build-capture2text.sh
