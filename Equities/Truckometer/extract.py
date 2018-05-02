@@ -38,6 +38,10 @@ for f in reversed(sorted(files)):
 
     num_to_parse -= 1
 
+    output, _ = subprocess.Popen(['pdftotext', f,
+                                  '-f', '3', '-l', '3', '-raw',  '-'], 
+                                 stdout=subprocess.PIPE).communicate()
+    
     # extract using convert ... pdf[3] image.png -crop 600x400+0x600
     # capture2text_cli ... extract output
     # pdftotext ANZ-Truckometer-20180411.pdf  -f 3 -l 3 -raw
