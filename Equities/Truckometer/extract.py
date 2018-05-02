@@ -38,6 +38,15 @@ for f in reversed(sorted(files)):
 
     num_to_parse -= 1
 
+    # So far the appendix always exists on page 3
+    PAGE_NUM = 3
+    
+    output, _ = subprocess.Popen(['pdfgrep', '-n', 'APPENDIX', f],
+                                 stdout=subprocess.PIPE).communicate()
+    
+    if ":" in output:
+        PAGE_NUM = int(output.split(':')[0])
+    
     output, _ = subprocess.Popen(['pdftotext', f,
                                   '-f', '3', '-l', '3', '-raw',  '-'], 
                                  stdout=subprocess.PIPE).communicate()
