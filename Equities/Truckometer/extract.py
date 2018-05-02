@@ -68,6 +68,3 @@ for f in reversed(sorted(files)):
         htraffic_index = res.group(5)
         htraffic_month_change = res.group(6)
         htraffic_annual_change = res.group(7)
-
-    # extract using convert ... pdf[3] image.png -crop 600x400+0x600
-    # capture2text_cli ... extract output
