@@ -32,6 +32,11 @@ for url in results:
 
     urllib.urlretrieve(urlparse.urljoin(TRUCKOMETER_URL, url.attrib['href']), filename)
 
+date_regex = '([a-zA-z][a-zA-z][a-zA-z]-\d\d)'
+num_regex = '([\d\.-]+)'
+
+line_regex = date_regex + '\s+' (num_regex + '\s+') * 5 + num_regex
+
 for f in reversed(sorted(files)):
     if num_to_parse == 0:
         break
@@ -50,6 +55,9 @@ for f in reversed(sorted(files)):
     output, _ = subprocess.Popen(['pdftotext', f,
                                   '-f', '3', '-l', '3', '-raw',  '-'], 
                                  stdout=subprocess.PIPE).communicate()
+    
+    for line in output.splitlines():
+        res = re.search(line_regex , line)
     
     # extract using convert ... pdf[3] image.png -crop 600x400+0x600
     # capture2text_cli ... extract output
