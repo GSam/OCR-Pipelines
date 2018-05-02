@@ -45,29 +45,29 @@ for f in reversed(sorted(files)):
 
     # So far the appendix always exists on page 3
     PAGE_NUM = 3
-    
+
     output, _ = subprocess.Popen(['pdfgrep', '-n', 'APPENDIX', f],
                                  stdout=subprocess.PIPE).communicate()
-    
+
     if ":" in output:
         PAGE_NUM = int(output.split(':')[0])
-    
+
     output, _ = subprocess.Popen(['pdftotext', f,
                                   '-f', '3', '-l', '3', '-raw',  '-'], 
                                  stdout=subprocess.PIPE).communicate()
-    
+
     for line in output.splitlines():
         res = re.search(line_regex , line)
-        
+
         date = res.group(1)
-        
+
         ltraffic_index = res.group(2)
         ltraffic_month_change = res.group(3)
         ltraffic_annual_change = res.group(4)
-        
+
         htraffic_index = res.group(5)
         htraffic_month_change = res.group(6)
         htraffic_annual_change = res.group(7)
-    
+
     # extract using convert ... pdf[3] image.png -crop 600x400+0x600
     # capture2text_cli ... extract output
