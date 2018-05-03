@@ -57,7 +57,7 @@ for f in reversed(sorted(files)):
                                  stdout=subprocess.PIPE).communicate()
 
     for line in output.splitlines():
-        res = re.search(line_regex , line)
+        res = re.search(line_regex, line)
 
         date = res.group(1)
 
