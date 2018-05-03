@@ -1,6 +1,7 @@
 import os
 import sys
 import subprocess
+import ah_image
 
 url = os.environ.get("AHTABLEURL")
 
@@ -18,4 +19,8 @@ url = url.format(sys.argv[1], sys.argv[2])
 # Capture2Text_CLI -i test.png --scale-factor=5 --blacklist=~
 output, _ = subprocess.Popen(['Capture2Text_CLI'],
                               stdout=subprocess.PIPE).communicate()
+
+filename = ''
+ah_image.process_image(filename)
+
 print(url)
