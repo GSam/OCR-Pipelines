@@ -3,6 +3,7 @@ import requests
 import urlparse
 import urllib
 import re, os, sys
+import subprocess
 
 num_to_parse = -1
 if len(sys.argv) > 1:
@@ -35,7 +36,7 @@ for url in results:
 date_regex = '([a-zA-z][a-zA-z][a-zA-z]-\d\d)'
 num_regex = '([\d\.-]+)'
 
-line_regex = date_regex + '\s+' (num_regex + '\s+') * 5 + num_regex
+line_regex = date_regex + '\s+' + (num_regex + '\s+') * 5 + num_regex
 
 for f in reversed(sorted(files)):
     if num_to_parse == 0:
@@ -53,11 +54,14 @@ for f in reversed(sorted(files)):
         PAGE_NUM = int(output.split(':')[0])
 
     output, _ = subprocess.Popen(['pdftotext', f,
-                                  '-f', '3', '-l', '3', '-raw',  '-'], 
+                                  '-f', '3', '-l', '3', '-raw',  '-'],
                                  stdout=subprocess.PIPE).communicate()
 
     for line in output.splitlines():
         res = re.search(line_regex, line)
+
+        if not res:
+            continue
 
         date = res.group(1)
 
@@ -68,3 +72,5 @@ for f in reversed(sorted(files)):
         htraffic_index = res.group(5)
         htraffic_month_change = res.group(6)
         htraffic_annual_change = res.group(7)
+
+        print ltraffic_index, ltraffic_month_change, ltraffic_annual_change, htraffic_index, htraffic_month_change, htraffic_annual_change
