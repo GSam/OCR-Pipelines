@@ -2,6 +2,8 @@ import os
 import sys
 import subprocess
 import ah_image
+import urlparse
+import urllib
 
 url = os.environ.get("AHTABLEURL")
 
@@ -13,6 +15,9 @@ if len(sys.argv) != 3:
     print("You must supply two arguments")
 
 url = url.format(sys.argv[1], sys.argv[2])
+
+urllib.URLopener.version = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:60.0) Gecko/20100101 Firefox/60.0'
+urllib.urlretrieve(url, temporary_file)
 
 output, _ = subprocess.Popen(['gs', '-s', 'DEVICE=pnggray', '-r', '600', '-g',
                               '2900x3235', '-o', output_gs, '-c',
