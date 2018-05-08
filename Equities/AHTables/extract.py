@@ -4,6 +4,8 @@ import subprocess
 import ah_image
 import urlparse
 import urllib
+import tempfile
+import shutil
 
 url = os.environ.get("AHTABLEURL")
 
@@ -14,7 +16,12 @@ if url is None:
 if len(sys.argv) != 3:
     print("You must supply two arguments")
 
+dirpath = tempfile.mkdtemp()
+
 url = url.format(sys.argv[1], sys.argv[2])
+print(url)
+
+temporary_file = os.path.join(dirpath, 'fetch.pdf')
 
 urllib.URLopener.version = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:60.0) Gecko/20100101 Firefox/60.0'
 urllib.urlretrieve(url, temporary_file)
@@ -32,7 +39,6 @@ output, _ = subprocess.Popen(['convert', '-white-threshold', '60%', '-colorspace
                               'PNG32:{}'.format(output_file)],
                              stdout=subprocess.PIPE).communicate()
 
-
 ah_image.process_image(output_file)
 
-print(url)
+shutil.rmtree(dirpath)
