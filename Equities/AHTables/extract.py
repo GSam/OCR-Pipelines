@@ -20,12 +20,19 @@ url = url.format(sys.argv[1], sys.argv[2])
 # gs -sDEVICE=pnggray -r1600  -o image.png AHTABLEURL
 
 output, _ = subprocess.Popen(['gs', '-s', 'DEVICE=pnggray', '-r', '600', '-g',
-                              '2900x3235', '-o', output_file, '-c',
+                              '2900x3235', '-o', output_gs, '-c',
                               '<</Install {-220 -170 translate}>> setpagedevice',
                               '-f', input_file],
                              stdout=subprocess.PIPE).communicate()
 
-filename = ''
-ah_image.process_image(filename)
+output_file = ''
+
+output, _ = subprocess.Popen(['convert', '-white-threshold', '60%', '-colorspace',
+                              'sRGB', '-type', 'truecolor', output_gs,
+                              'PNG32:{}'.format(output_file)],
+                             stdout=subprocess.PIPE).communicate()
+
+
+ah_image.process_image(output_file)
 
 print(url)
