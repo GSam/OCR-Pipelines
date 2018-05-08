@@ -5,4 +5,5 @@ def process_image(filename):
                                   '--blacklist', '~', '--scale-factor', '1'],
                                   stdout=subprocess.PIPE).communicate()
     # interpret output here
-    return ''
+    print output
+    return output
