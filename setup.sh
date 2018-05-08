@@ -6,4 +6,5 @@ sudo apt-get install -y libtesseract-dev qtbase5-dev libleptonica-dev
 # Truckometer dependencies
 sudo apt-get install -y python-lxml python-requests poppler-utils pdfgrep
 
-# imagemagick
+# AHTable dependencies
+sudo apt-get install -y imagemagick ghostscript
