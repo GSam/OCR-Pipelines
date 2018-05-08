@@ -31,7 +31,7 @@ output_gs = os.path.join(dirpath, 'pdf_to_png.png')
 output, _ = subprocess.Popen(['gs', '-s', 'DEVICE=pnggray', '-r', '600', '-g',
                               '2900x3235', '-o', output_gs, '-c',
                               '<</Install {-220 -170 translate}>> setpagedevice',
-                              '-f', input_file],
+                              '-f', temporary_file],
                              stdout=subprocess.PIPE).communicate()
 
 output_file = os.path.join(dirpath, 'pre_processed.png')
