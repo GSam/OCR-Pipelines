@@ -48,6 +48,6 @@ output, _ = subprocess.Popen(['convert', '-white-threshold', '60%', '-colorspace
                               'PNG32:{}'.format(output_file)],
                              stdout=subprocess.PIPE).communicate()
 
-ah_image.process_image(output_file)
+ah_image.process_image(output_file, scale=0.8)
 
 shutil.rmtree(dirpath)
