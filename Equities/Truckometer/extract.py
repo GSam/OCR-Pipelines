@@ -73,4 +73,4 @@ for f in reversed(sorted(files)):
         htraffic_month_change = res.group(6)
         htraffic_annual_change = res.group(7)
 
-        print ltraffic_index, ltraffic_month_change, ltraffic_annual_change, htraffic_index, htraffic_month_change, htraffic_annual_change
+        print date, ltraffic_index, ltraffic_month_change, ltraffic_annual_change, htraffic_index, htraffic_month_change, htraffic_annual_change
