@@ -37,7 +37,14 @@ output, _ = subprocess.Popen(['gs', '-sDEVICE=pnggray', '-r600',
 output_file = os.path.join(dirpath, 'pre_processed.png')
 
 output, _ = subprocess.Popen(['convert', '-white-threshold', '60%', '-colorspace',
-                              'sRGB', '-type', 'truecolor', output_gs,
+                              'sRGB', '-type', 'truecolor',
+                              '-fill', 'white', '-stroke', 'white',
+                              '-strokewidth', '5',
+                              '-draw', 'line 0 1942 2900 1942',
+                              '-draw', 'line 0 1441 2900 1441',
+                              '-draw', 'line 0 1558 2900 1558',
+                              '-draw', 'line 0 1825 2900 1825',
+                              output_gs,
                               'PNG32:{}'.format(output_file)],
                              stdout=subprocess.PIPE).communicate()
 
