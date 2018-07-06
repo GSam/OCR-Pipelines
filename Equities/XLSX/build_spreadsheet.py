@@ -13,7 +13,7 @@ def build_worksheet(workbook, name, records):
         ('AMOUNT', ('Amount', None, '=SUM({AMOUNT})')),
         ('PRICE', ('Price paid', None)),
         ('FEES', ('Fees', None)),
-        ('TOTAL_PRICE', ('Total price', '={PRICE}*{AMOUNT}', '=SUM({TOTAL_PRICE})', '=AVERAGEIF({TOTAL_PRICE},"<>0")')),
+        ('TOTAL_PRICE', ('Total price', '={PRICE}*{AMOUNT}', '=SUM({TOTAL_PRICE})', '=IF(SUM({TOTAL_PRICE})<>0, AVERAGEIF({TOTAL_PRICE},"<>0"), 0)')),
         ('TOTAL_W_FEE', ('Total price (+fee)', '={TOTAL_PRICE}+IF({TYPE}<>"CASH",{FEES},0)', '=SUM({TOTAL_W_FEE})', '=AVERAGEIF({TOTAL_W_FEE},"<>0")')),
         ('DIV_YIELD', ('Dividend yield', '=IF({TYPE}<>"CASH", {TOTAL_DIVIDEND}/{AMOUNT} + IF({TYPE}="DIV", 0, {TOTAL_CASH}/{TOTAL_PRICE}), "")',
                        '=(SUM({TOTAL_DIVIDEND})*SUM({PRICE})+SUM({TOTAL_CASH}))/{__TOT__TOTAL_W_FEE}')),
@@ -22,9 +22,9 @@ def build_worksheet(workbook, name, records):
         ('GROSS_PROFIT', ('Gross profit', '=IF({TYPE}<>"BUY", "", (({AMOUNT}+{TOTAL_DIVIDEND})*{CURRENT_PRICE} - {TOTAL_PRICE} + {TOTAL_CASH})/{TOTAL_PRICE})',
                           '={GROSS_GAIN}/{__TOT__TOTAL_PRICE}')),
         ('NET_PROFIT', ('Net profit', '=IF({TYPE}<>"BUY", "", (({AMOUNT}+{TOTAL_DIVIDEND})* {CURRENT_PRICE}-{TOTAL_W_FEE}+{TOTAL_CASH})/{TOTAL_W_FEE})',
-                        '={NET_PROFIT}/{__TOT__TOTAL_W_FEE}')),
+                        '={NET_PROFIT}/{__TOT__TOTAL_W_FEE}')), # =((M11 + 1) ^ (1/((TODAY()-MIN($C2:$C8))/365)) - 1)
         ('ANNUALIZED', ('Annual profit', '=IF({TYPE}<>"BUY","",(({NET_PROFIT}+1)^(1/((TODAY()-{DATE})/365))-1))',
-                        '=SUM({ANNUALIZED})')),
+                        '=SUM({ANNUALIZED})')), # =SUMPRODUCT(E2:E10,N2:N10)/SUMIF(D2:D10, "=BUY",E2:E10)
         ('TOTAL_VALUE', ('Total value', None)), # ={__TOT__AMOUNT} * SUM({PRICE})
         ('GROSS_GAIN', ('Gross gain', None)), # ={TOTAL_VALUE}-{__TOT__TOTAL_PRICE}+{CASH_FINAL}
         ('NET_GAIN', ('Net gain', None)), # =({TOTAL_VALUE}-{__TOT__TOTAL_W_FREE})+{CASH_FINAL}
