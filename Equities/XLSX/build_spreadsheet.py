@@ -15,14 +15,19 @@ def build_worksheet(workbook, name, records):
         ('FEES', ('Fees', None)),
         ('TOTAL_PRICE', ('Total price', '={PRICE}*{AMOUNT}', '=SUM({TOTAL_PRICE})', '=AVERAGEIF({TOTAL_PRICE},"<>0")')),
         ('TOTAL_W_FEE', ('Total price (+fee)', '={TOTAL_PRICE}+IF({TYPE}<>"CASH",{FEES},0)', '=SUM({TOTAL_W_FEE})', '=AVERAGEIF({TOTAL_W_FEE},"<>0")')),
-        ('DIV_YIELD', ('Dividend yield', '=IF({TYPE}<>"CASH", {TOTAL_DIVIDEND}/{AMOUNT} + IF({TYPE}="DIV", 0, {TOTAL_CASH}/{TOTAL_PRICE}), "")')),
-        ('CAP_GAIN', ('Capital gain', '=IF({TYPE}<>"BUY","",({CURRENT_PRICE}-{PRICE})/{PRICE})')),
-        ('GROSS_PROFIT', ('Gross profit', '=IF({TYPE}<>"BUY", "", (({AMOUNT}+{TOTAL_DIVIDEND})*{CURRENT_PRICE} - {TOTAL_PRICE} + {TOTAL_CASH})/{TOTAL_PRICE})')),
-        ('NET_PROFIT', ('Net profit', '=IF({TYPE}<>"BUY", "", (({AMOUNT}+{TOTAL_DIVIDEND})* {CURRENT_PRICE}-{TOTAL_W_FEE}+{TOTAL_CASH})/{TOTAL_W_FEE})')),
-        ('ANNUALIZED', ('Annual profit', '=IF({TYPE}<>"BUY","",(({NET_PROFIT}+1)^(1/((TODAY()-{DATE})/365))-1))')),
-        ('TOTAL_VALUE', ('Total value', None)), # =E11 * $B$2
-        ('GROSS_GAIN', ('Gross gain', None)), # =O2-H11+AB6
-        ('NET_GAIN', ('Net gain', None)), # =(O2-I11)+AB6
+        ('DIV_YIELD', ('Dividend yield', '=IF({TYPE}<>"CASH", {TOTAL_DIVIDEND}/{AMOUNT} + IF({TYPE}="DIV", 0, {TOTAL_CASH}/{TOTAL_PRICE}), "")',
+                       '=(SUM({TOTAL_DIVIDEND})*SUM({PRICE})+SUM({TOTAL_CASH}))/{__TOT__TOTAL_W_FEE}')),
+        ('CAP_GAIN', ('Capital gain', '=IF({TYPE}<>"BUY","",({CURRENT_PRICE}-{PRICE})/{PRICE})',
+                      '=(SUM({CAPITAL_PRICE})-{__TOT__TOTAL_W_FEE})/{__TOT__TOTAL_PRICE}')),
+        ('GROSS_PROFIT', ('Gross profit', '=IF({TYPE}<>"BUY", "", (({AMOUNT}+{TOTAL_DIVIDEND})*{CURRENT_PRICE} - {TOTAL_PRICE} + {TOTAL_CASH})/{TOTAL_PRICE})',
+                          '={GROSS_GAIN}/{__TOT__TOTAL_PRICE}')),
+        ('NET_PROFIT', ('Net profit', '=IF({TYPE}<>"BUY", "", (({AMOUNT}+{TOTAL_DIVIDEND})* {CURRENT_PRICE}-{TOTAL_W_FEE}+{TOTAL_CASH})/{TOTAL_W_FEE})',
+                        '={NET_PROFIT}/{__TOT__TOTAL_W_FEE}')),
+        ('ANNUALIZED', ('Annual profit', '=IF({TYPE}<>"BUY","",(({NET_PROFIT}+1)^(1/((TODAY()-{DATE})/365))-1))',
+                        '=SUM({ANNUALIZED})')),
+        ('TOTAL_VALUE', ('Total value', None)), # ={__TOT__AMOUNT} * SUM({PRICE})
+        ('GROSS_GAIN', ('Gross gain', None)), # ={TOTAL_VALUE}-{__TOT__TOTAL_PRICE}+{CASH_FINAL}
+        ('NET_GAIN', ('Net gain', None)), # =({TOTAL_VALUE}-{__TOT__TOTAL_W_FREE})+{CASH_FINAL}
         ('__BLANK__', ('', None)),
         ('SHARE_RUNNING', ('Share running total', '=SUM({AMOUNT_ZERO}:{AMOUNT})')),
         ('PREV_RUNNING', ('Previous running total', '={SHARE_RUNNING}-{AMOUNT}')),
@@ -92,6 +97,7 @@ def build_worksheet(workbook, name, records):
             tmp_cell = cells[cell][2].format(**A1_DICT)
             print(tmp_cell)
             worksheet.write(cur_row, i, tmp_cell)
+            A1_DICT['__TOT__' + cell] = xl_rowcol_to_cell(cur_row, i)
 
 workbook = xlsxwriter.Workbook('stocks.xlsx')
 records = [{'date': datetime.datetime.strptime('2013-01-23', '%Y-%m-%d'),
