@@ -108,3 +108,15 @@ records = [{'date': datetime.datetime.strptime('2013-01-23', '%Y-%m-%d'),
            }]
 build_worksheet(workbook, 'FNZ', records)
 workbook.close()
+
+'''
+TODO
+worksheet.conditional_format('B3:K12', {'type':     'cell',
+                                        'criteria': '>',
+                                        'value':    0,
+                                        'format':   green_format})
+
+worksheet.conditional_format('B3:K12', {'type':     'cell',
+                                        'criteria': '<',
+                                        'value':    0,
+                                        'format':   red_format})'''
