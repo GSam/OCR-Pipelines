@@ -23,6 +23,8 @@ def build_worksheet(workbook, name, records):
         ('TOTAL_VALUE', ('Total value', None)), # =E11 * $B$2
         ('GROSS_GAIN', ('Gross gain', None)), # =O2-H11+AB6
         ('NET_GAIN', ('Net gain', None)), # =(O2-I11)+AB6
+        ('__BLANK__', ('', None)),
+        ('SHARE_RUNNING', ('Share running total', '=SUM({AMOUNT_ZERO}:{AMOUNT})')),
     ])
 
     order = cells.keys()
@@ -50,6 +52,7 @@ def build_worksheet(workbook, name, records):
 
         # Write formula fields
         A1_DICT = dict([(x, xl_rowcol_to_cell(cur_row, i)) for i, x in enumerate(cells)])
+        A1_DICT['AMOUNT_ZERO'] = xl_rowcol_to_cell(2, AMOUNT)
 
         for cell in cells:
             if cells[cell][1] is not None:
