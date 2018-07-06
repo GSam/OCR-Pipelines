@@ -15,11 +15,11 @@ def build_worksheet(workbook, name, records):
         ('FEES', ('Fees', None)),
         ('TOTAL_PRICE', ('Total price', '={PRICE}*{AMOUNT}')),
         ('TOTAL_W_FEE', ('Total price (+fee)', '={TOTAL_PRICE}+IF({TYPE}<>"CASH",{FEES},0)')),
-        ('DIV_YIELD', ('Dividend yield', '=IF({TYPE}<>"CASH", W2/{AMOUNT} + IF({TYPE}="DIV", 0, AA2/{TOTAL_PRICE}), "")')),
+        ('DIV_YIELD', ('Dividend yield', '=IF({TYPE}<>"CASH", {TOTAL_DIVIDEND}/{AMOUNT} + IF({TYPE}="DIV", 0, {TOTAL_CASH}/{TOTAL_PRICE}), "")')),
         ('CAP_GAIN', ('Capital gain', '=IF({TYPE}<>"BUY","",({CURRENT_PRICE}-{PRICE})/{PRICE})')),
-        ('GROSS_PROFIT', ('Gross profit', '=IF({TYPE}<>"BUY", "", (({AMOUNT}+W2)*{CURRENT_PRICE} - {TOTAL_PRICE} + AA2)/{TOTAL_PRICE})')),
-        ('NET_PROFIT', ('Net profit', '=IF({TYPE}<>"BUY", "", (({AMOUNT}+W2)* {CURRENT_PRICE}-{TOTAL_W_FEE}+AA2)/{TOTAL_W_FEE})')),
-        ('ANNUALIZED', ('Annual profit', '=IF({TYPE}<>"BUY","",((M2+1)^(1/((TODAY()-{DATE})/365))-1))')),
+        ('GROSS_PROFIT', ('Gross profit', '=IF({TYPE}<>"BUY", "", (({AMOUNT}+{TOTAL_DIVIDEND})*{CURRENT_PRICE} - {TOTAL_PRICE} + {TOTAL_CASH})/{TOTAL_PRICE})')),
+        ('NET_PROFIT', ('Net profit', '=IF({TYPE}<>"BUY", "", (({AMOUNT}+{TOTAL_DIVIDEND})* {CURRENT_PRICE}-{TOTAL_W_FEE}+{TOTAL_CASH})/{TOTAL_W_FEE})')),
+        ('ANNUALIZED', ('Annual profit', '=IF({TYPE}<>"BUY","",(({NET_PROFIT}+1)^(1/((TODAY()-{DATE})/365))-1))')),
         ('TOTAL_VALUE', ('Total value', None)), # =E11 * $B$2
         ('GROSS_GAIN', ('Gross gain', None)), # =O2-H11+AB6
         ('NET_GAIN', ('Net gain', None)), # =(O2-I11)+AB6
@@ -30,6 +30,11 @@ def build_worksheet(workbook, name, records):
         ('TOT_DIV_PER_SHARE', ('Total dividends per share', '=IF(ROW()>={FINAL_ROW}, 0, SUM(INDIRECT(ADDRESS(ROW({DIV_PER_SHARE})+1, COLUMN({DIV_PER_SHARE}))):INDIRECT(ADDRESS({FINAL_ROW}, COLUMN({DIV_PER_SHARE})))))')),
         ('TOTAL_DIVIDEND', ('Total dividends', '={TOT_DIV_PER_SHARE}*{AMOUNT}')),
         ('DIV_RUNNING', ('Dividend running total', '=SUM(INDIRECT(ADDRESS({FIRST_ROW},COLUMN({TOTAL_DIVIDEND}))):{TOTAL_DIVIDEND})')),
+        ('CASH_PER_SHARE', ('Cash per share', '=IF({TYPE}="CASH",{FEES}/{PREV_RUNNING},0)')),
+        ('TOT_CASH_PER_SHARE', ('Total cash per share', '=IF(ROW()>={FINAL_ROW}, 0, SUM(INDIRECT(ADDRESS(ROW({CASH_PER_SHARE})+1, COLUMN({CASH_PER_SHARE}))):INDIRECT(ADDRESS({FINAL_ROW}, COLUMN({CASH_PER_SHARE})))))')),
+        ('TOTAL_CASH', ('Total cash', '={TOT_CASH_PER_SHARE}*{AMOUNT}')),
+        ('CASH_RUNNING', ('Cash running total', '=SUM(INDIRECT(ADDRESS({FIRST_ROW},COLUMN({TOTAL_CASH}))):{TOTAL_CASH})')),
+        ('CAPITAL_PRICE', ('Capital price', '=IF({TYPE}="BUY",{PRICE}*{AMOUNT},0)')),
     ])
 
     order = cells.keys()
