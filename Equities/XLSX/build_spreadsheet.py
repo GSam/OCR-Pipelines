@@ -28,6 +28,8 @@ def build_worksheet(workbook, name, records):
         ('PREV_RUNNING', ('Previous running total', '={SHARE_RUNNING}-{AMOUNT}')),
         ('DIV_PER_SHARE', ('Dividends per share', '=IF({TYPE}="DIV",{AMOUNT}/{PREV_RUNNING},0)')),
         ('TOT_DIV_PER_SHARE', ('Total dividends per share', '=IF(ROW()>={FINAL_ROW}, 0, SUM(INDIRECT(ADDRESS(ROW({DIV_PER_SHARE})+1, COLUMN({DIV_PER_SHARE}))):INDIRECT(ADDRESS({FINAL_ROW}, COLUMN({DIV_PER_SHARE})))))')),
+        ('TOTAL_DIVIDEND', ('Total dividends', '={TOT_DIV_PER_SHARE}*{AMOUNT}')),
+        ('DIV_RUNNING', ('Dividend running total', '=SUM(INDIRECT(ADDRESS({FIRST_ROW},COLUMN({TOTAL_DIVIDEND}))):{TOTAL_DIVIDEND})')),
     ])
 
     order = cells.keys()
@@ -64,6 +66,7 @@ def build_worksheet(workbook, name, records):
         # Write formula fields
         A1_DICT = dict([(x, xl_rowcol_to_cell(cur_row, i)) for i, x in enumerate(cells)])
         A1_DICT['AMOUNT_ZERO'] = xl_rowcol_to_cell(2, AMOUNT)
+        A1_DICT['FIRST_ROW'] = 2
         A1_DICT['FINAL_ROW'] = len(records) + 1
 
         for cell in cells:
