@@ -27,6 +27,7 @@ def build_worksheet(workbook, name, records):
         ('SHARE_RUNNING', ('Share running total', '=SUM({AMOUNT_ZERO}:{AMOUNT})')),
         ('PREV_RUNNING', ('Previous running total', '={SHARE_RUNNING}-{AMOUNT}')),
         ('DIV_PER_SHARE', ('Dividends per share', '=IF({TYPE}="DIV",{AMOUNT}/{PREV_RUNNING},0)')),
+        ('TOT_DIV_PER_SHARE', ('Total dividends per share', '=IF(ROW()>={FINAL_ROW}, 0, SUM(INDIRECT(ADDRESS(ROW({DIV_PER_SHARE})+1, COLUMN({DIV_PER_SHARE}))):INDIRECT(ADDRESS({FINAL_ROW}, COLUMN({DIV_PER_SHARE})))))')),
     ])
 
     order = cells.keys()
@@ -50,7 +51,7 @@ def build_worksheet(workbook, name, records):
 
     cur_row += 1
 
-    date_format = workbook.add_format({'num_format': 'dd/mm/yyyy'})
+    date_format = workbook.add_format({'num_format': 'dd/mm/yy'})
 
     for row in records:
         # Write non-formula fields
@@ -63,10 +64,12 @@ def build_worksheet(workbook, name, records):
         # Write formula fields
         A1_DICT = dict([(x, xl_rowcol_to_cell(cur_row, i)) for i, x in enumerate(cells)])
         A1_DICT['AMOUNT_ZERO'] = xl_rowcol_to_cell(2, AMOUNT)
+        A1_DICT['FINAL_ROW'] = len(records) + 1
 
         for cell in cells:
             if cells[cell][1] is not None:
                 tmp_cell = cells[cell][1].format(**A1_DICT)
+                print(tmp_cell)
                 worksheet.write(A1_DICT[cell], tmp_cell)
         cur_row += 1
 
