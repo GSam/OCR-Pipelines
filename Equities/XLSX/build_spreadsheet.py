@@ -1,5 +1,5 @@
 import xlsxwriter
-from xlsxwriter.utility import xl_rowcol_to_cell
+from xlsxwriter.utility import xl_rowcol_to_cell, xl_range
 from collections import OrderedDict
 import datetime
 
@@ -9,12 +9,12 @@ def build_worksheet(workbook, name, records):
         ('STOCK', ('Stock', None)),
         ('CURRENT_PRICE', ('Current price', None)),
         ('DATE', ('Date', None)),
-        ('TYPE', ('Type', None)),
-        ('AMOUNT', ('Amount', None)),
+        ('TYPE', ('Type', None, 'Total')),
+        ('AMOUNT', ('Amount', None, '=SUM({AMOUNT})')),
         ('PRICE', ('Price paid', None)),
         ('FEES', ('Fees', None)),
-        ('TOTAL_PRICE', ('Total price', '={PRICE}*{AMOUNT}')),
-        ('TOTAL_W_FEE', ('Total price (+fee)', '={TOTAL_PRICE}+IF({TYPE}<>"CASH",{FEES},0)')),
+        ('TOTAL_PRICE', ('Total price', '={PRICE}*{AMOUNT}', '=SUM({TOTAL_PRICE})', '=AVERAGEIF({TOTAL_PRICE},"<>0")')),
+        ('TOTAL_W_FEE', ('Total price (+fee)', '={TOTAL_PRICE}+IF({TYPE}<>"CASH",{FEES},0)', '=SUM({TOTAL_W_FEE})', '=AVERAGEIF({TOTAL_W_FEE},"<>0")')),
         ('DIV_YIELD', ('Dividend yield', '=IF({TYPE}<>"CASH", {TOTAL_DIVIDEND}/{AMOUNT} + IF({TYPE}="DIV", 0, {TOTAL_CASH}/{TOTAL_PRICE}), "")')),
         ('CAP_GAIN', ('Capital gain', '=IF({TYPE}<>"BUY","",({CURRENT_PRICE}-{PRICE})/{PRICE})')),
         ('GROSS_PROFIT', ('Gross profit', '=IF({TYPE}<>"BUY", "", (({AMOUNT}+{TOTAL_DIVIDEND})*{CURRENT_PRICE} - {TOTAL_PRICE} + {TOTAL_CASH})/{TOTAL_PRICE})')),
@@ -70,9 +70,9 @@ def build_worksheet(workbook, name, records):
 
         # Write formula fields
         A1_DICT = dict([(x, xl_rowcol_to_cell(cur_row, i)) for i, x in enumerate(cells)])
-        A1_DICT['AMOUNT_ZERO'] = xl_rowcol_to_cell(2, AMOUNT)
-        A1_DICT['FIRST_ROW'] = 2
-        A1_DICT['FINAL_ROW'] = len(records) + 1
+        A1_DICT['AMOUNT_ZERO'] = xl_rowcol_to_cell(1, AMOUNT)
+        A1_DICT['FIRST_ROW'] = 1
+        A1_DICT['FINAL_ROW'] = len(records)
 
         for cell in cells:
             if cells[cell][1] is not None:
@@ -82,6 +82,16 @@ def build_worksheet(workbook, name, records):
         cur_row += 1
 
     # Write aggregated fields
+    first_row = 1
+    final_row = len(records)
+
+    A1_DICT = dict([(x, xl_range(first_row, i, final_row, i)) for i, x in enumerate(cells)])
+    print A1_DICT
+    for i, cell in enumerate(cells):
+        if len(cells[cell]) > 2:
+            tmp_cell = cells[cell][2].format(**A1_DICT)
+            print(tmp_cell)
+            worksheet.write(cur_row, i, tmp_cell)
 
 workbook = xlsxwriter.Workbook('stocks.xlsx')
 records = [{'date': datetime.datetime.strptime('2013-01-23', '%Y-%m-%d'),
