@@ -1,6 +1,7 @@
 import xlsxwriter
 from xlsxwriter.utility import xl_rowcol_to_cell
 from collections import OrderedDict
+import datetime
 
 def build_worksheet(workbook, name, records):
     worksheet = workbook.add_worksheet(name)
@@ -24,12 +25,14 @@ def build_worksheet(workbook, name, records):
         ('NET_GAIN', ('Net gain', None)), # =(O2-I11)+AB6
     ])
 
-    DATE = cells.index('DATE')
-    TYPE = cells.index('TYPE')
-    AMOUNT = cells.index('AMOUNT')
-    PRICE = cells.index('PRICE')
-    FEES = cells.index('FEES')
+    order = cells.keys()
+    DATE = order.index('DATE')
+    TYPE = order.index('TYPE')
+    AMOUNT = order.index('AMOUNT')
+    PRICE = order.index('PRICE')
+    FEES = order.index('FEES')
 
+    cur_row = 0
     for row in records:
         # Write non-formula fields
         worksheet.write_datetime(cur_row, DATE, row['date'])
@@ -47,3 +50,13 @@ def build_worksheet(workbook, name, records):
                 worksheet.write(A1_DICT[cell], tmp_cell)
 
     # Write aggregated fields
+
+workbook = xlsxwriter.Workbook('stocks.xlsx')
+records = [{'date': datetime.datetime.strptime('2013-01-23', '%Y-%m-%d'),
+            'type': 'BUY',
+            'amount': 100,
+            'price': 2.17,
+            'fee': 30
+           }]
+build_worksheet(workbook, 'FNZ', records)
+workbook.close()
