@@ -33,6 +33,13 @@ def build_worksheet(workbook, name, records):
     FEES = order.index('FEES')
 
     cur_row = 0
+
+    # Write header
+    for i, key in enumerate(cells):
+        worksheet.write(cur_row, i, cells[key][0])
+
+    cur_row += 1
+
     for row in records:
         # Write non-formula fields
         worksheet.write_datetime(cur_row, DATE, row['date'])
@@ -48,6 +55,7 @@ def build_worksheet(workbook, name, records):
             if cells[cell][1] is not None:
                 tmp_cell = cells[cell][1].format(**A1_DICT)
                 worksheet.write(A1_DICT[cell], tmp_cell)
+        cur_row += 1
 
     # Write aggregated fields
 
