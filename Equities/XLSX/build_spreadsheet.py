@@ -25,6 +25,8 @@ def build_worksheet(workbook, name, records):
         ('NET_GAIN', ('Net gain', None)), # =(O2-I11)+AB6
         ('__BLANK__', ('', None)),
         ('SHARE_RUNNING', ('Share running total', '=SUM({AMOUNT_ZERO}:{AMOUNT})')),
+        ('PREV_RUNNING', ('Previous running total', '={SHARE_RUNNING}-{AMOUNT}')),
+        ('DIV_PER_SHARE', ('Dividends per share', '=IF({TYPE}="DIV",{AMOUNT}/{PREV_RUNNING},0)')),
     ])
 
     order = cells.keys()
@@ -36,15 +38,23 @@ def build_worksheet(workbook, name, records):
 
     cur_row = 0
 
+    header_format = workbook.add_format({'text_wrap': True,
+                                         'bold': True,
+                                         'font_color': 'white',
+                                         'bg_color': 'black',
+                                         'valign': 'vcenter'})
+
     # Write header
     for i, key in enumerate(cells):
-        worksheet.write(cur_row, i, cells[key][0])
+        worksheet.write(cur_row, i, cells[key][0], header_format)
 
     cur_row += 1
 
+    date_format = workbook.add_format({'num_format': 'dd/mm/yyyy'})
+
     for row in records:
         # Write non-formula fields
-        worksheet.write_datetime(cur_row, DATE, row['date'])
+        worksheet.write_datetime(cur_row, DATE, row['date'], date_format)
         worksheet.write(cur_row, TYPE, row['type'])
         worksheet.write(cur_row, AMOUNT, row['amount'])
         worksheet.write(cur_row, PRICE, row['price'])
