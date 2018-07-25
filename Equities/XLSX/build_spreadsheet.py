@@ -26,7 +26,7 @@ def build_worksheet(workbook, name, records):
                           '=SUM({GROSS_GAIN})/{__TOT__TOTAL_PRICE}',
                           '=(({__TOT__GROSS_PROFIT} + 1) ^ (1/((TODAY()-MIN({DATE}))/365)) - 1)')),
         ('NET_PROFIT', ('Net profit', '=IF({TYPE}<>"BUY", "", (({AMOUNT}+{TOTAL_DIVIDEND})* {CURRENT_PRICE}-{TOTAL_W_FEE}+{TOTAL_CASH})/{TOTAL_W_FEE})',
-                        '=SUM({NET_PROFIT})/{__TOT__TOTAL_W_FEE}',
+                        '=SUM({NET_GAIN})/{__TOT__TOTAL_W_FEE}',
                         '=(({__TOT__NET_PROFIT} + 1) ^ (1/((TODAY()-MIN({DATE}))/365)) - 1)')),
         ('ANNUALIZED', ('Annual profit', '=IF({TYPE}<>"BUY","",(({NET_PROFIT}+1)^(1/((TODAY()-{DATE})/365))-1))',
                         '=SUM({ANNUALIZED})')), # =SUMPRODUCT(E2:E10,N2:N10)/SUMIF(D2:D10, "=BUY",E2:E10)
