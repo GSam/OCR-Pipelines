@@ -32,7 +32,7 @@ def build_worksheet(workbook, name, records):
                         '=SUM({ANNUALIZED})')), # =SUMPRODUCT(E2:E10,N2:N10)/SUMIF(D2:D10, "=BUY",E2:E10)
         ('TOTAL_VALUE', ('Total value', None)), # ={__TOT__AMOUNT} * SUM({PRICE})
         ('GROSS_GAIN', ('Gross gain', None)), # ={TOTAL_VALUE}-{__TOT__TOTAL_PRICE}+{CASH_FINAL}
-        ('NET_GAIN', ('Net gain', None)), # =({TOTAL_VALUE}-{__TOT__TOTAL_W_FREE})+{CASH_FINAL}
+        ('NET_GAIN', ('Net gain', None)), # =({TOTAL_VALUE}-{__TOT__TOTAL_W_FEE})+{CASH_FINAL}
         ('__BLANK__', ('', None)),
         ('SHARE_RUNNING', ('Share running total', '=SUM({AMOUNT_ZERO}:{AMOUNT})')),
         ('PREV_RUNNING', ('Previous running total', '={SHARE_RUNNING}-{AMOUNT}')),
@@ -81,8 +81,8 @@ def build_worksheet(workbook, name, records):
         # Write formula fields
         A1_DICT = dict([(x, xl_rowcol_to_cell(cur_row, i)) for i, x in enumerate(cells)])
         A1_DICT['AMOUNT_ZERO'] = xl_rowcol_to_cell(1, AMOUNT)
-        A1_DICT['FIRST_ROW'] = 1
-        A1_DICT['FINAL_ROW'] = len(records)
+        A1_DICT['FIRST_ROW'] = 2
+        A1_DICT['FINAL_ROW'] = len(records) + 1
 
         for cell in cells:
             if cells[cell][1] is not None:
@@ -96,6 +96,8 @@ def build_worksheet(workbook, name, records):
     final_row = len(records)
 
     A1_DICT = dict([(x, xl_range(first_row, i, final_row, i)) for i, x in enumerate(cells)])
+    A1_DICT['FIRST_ROW'] = 2
+    A1_DICT['FINAL_ROW'] = len(records) + 1
     print A1_DICT
     for i, cell in enumerate(cells):
         if len(cells[cell]) > 2:
@@ -120,6 +122,14 @@ def build_worksheet(workbook, name, records):
                     worksheet.write(cur_row + 3, i, 'P.A. (+tax)')
                 else:
                     worksheet.write(cur_row + 3, i, '={}/0.67'.format(xl_rowcol_to_cell(cur_row + 2, i)))
+
+    # Write final aggregates
+    i = order.index('TOTAL_VALUE')
+    worksheet.write(1, i, '={__TOT__AMOUNT} * SUM({CURRENT_PRICE})'.format(**A1_DICT))
+    i = order.index('GROSS_GAIN')
+    worksheet.write(1, i, '={TOTAL_VALUE}-{__TOT__TOTAL_PRICE}+INDIRECT(ADDRESS({FINAL_ROW}, COLUMN({CASH_RUNNING})))'.format(**A1_DICT))
+    i = order.index('NET_GAIN')
+    worksheet.write(1, i, '=({TOTAL_VALUE}-{__TOT__TOTAL_W_FEE})+INDIRECT(ADDRESS({FINAL_ROW}, COLUMN({CASH_RUNNING})))'.format(**A1_DICT))
 
 
 workbook = xlsxwriter.Workbook('stocks.xlsx')
