@@ -15,7 +15,7 @@ def build_worksheet(workbook, name, records):
         ('FEES', ('Fees', None)),
         ('TOTAL_PRICE', ('Total price', '={PRICE}*{AMOUNT}', '=SUM({TOTAL_PRICE})')),
 
-        ('TOTAL_W_FEE', ('Total price (+fee)', '={TOTAL_PRICE}+IF({TYPE}<>"CASH",{FEES},0)', '=SUM({TOTAL_W_FEE})', 'P.A. (–tax)')),
+        ('TOTAL_W_FEE', ('Total price (+fee)', '={TOTAL_PRICE}+IF({TYPE}<>"CASH",{FEES},0)', '=SUM({TOTAL_W_FEE})', 'P.A. (~tax)')),
         ('DIV_YIELD', ('Dividend yield', '=IF({TYPE}<>"CASH", {TOTAL_DIVIDEND}/{AMOUNT} + IF({TYPE}="DIV", 0, {TOTAL_CASH}/{TOTAL_PRICE}), "")',
                        '=(SUM({TOTAL_DIVIDEND})*SUM({PRICE})+SUM({TOTAL_CASH}))/{__TOT__TOTAL_W_FEE}',
                       '=(({__TOT__DIV_YIELD} + 1) ^ (1/((TODAY()-MIN({DATE}))/365)) - 1)')),
