@@ -44,7 +44,7 @@ def build_worksheet(workbook, name, records):
         ('TOT_CASH_PER_SHARE', ('Total cash per share', '=IF(ROW()>={FINAL_ROW}, 0, SUM(INDIRECT(ADDRESS(ROW({CASH_PER_SHARE})+1, COLUMN({CASH_PER_SHARE}))):INDIRECT(ADDRESS({FINAL_ROW}, COLUMN({CASH_PER_SHARE})))))')),
         ('TOTAL_CASH', ('Total cash', '={TOT_CASH_PER_SHARE}*{AMOUNT}')),
         ('CASH_RUNNING', ('Cash running total', '=SUM(INDIRECT(ADDRESS({FIRST_ROW},COLUMN({TOTAL_CASH}))):{TOTAL_CASH})')),
-        ('CAPITAL_PRICE', ('Capital price', '=IF({TYPE}="BUY",{PRICE}*{AMOUNT},0)')),
+        ('CAPITAL_PRICE', ('Capital price', '=IF({TYPE}="BUY",{CURRENT_PRICE}*{AMOUNT},0)')),
     ])
 
     order = cells.keys()
@@ -83,6 +83,7 @@ def build_worksheet(workbook, name, records):
         A1_DICT['AMOUNT_ZERO'] = xl_rowcol_to_cell(1, AMOUNT)
         A1_DICT['FIRST_ROW'] = 2
         A1_DICT['FINAL_ROW'] = len(records) + 1
+        A1_DICT['CURRENT_PRICE'] = xl_rowcol_to_cell(1, order.index('CURRENT_PRICE'), row_abs=True , col_abs=True)
 
         for cell in cells:
             if cells[cell][1] is not None:
