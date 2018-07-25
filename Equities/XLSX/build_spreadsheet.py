@@ -99,6 +99,14 @@ def build_worksheet(workbook, name, records):
             worksheet.write(cur_row, i, tmp_cell)
             A1_DICT['__TOT__' + cell] = xl_rowcol_to_cell(cur_row, i)
 
+            if not cells[cell][2].startswith('='):
+                worksheet.write(cur_row + 1, i, 'Average')
+                continue
+
+            tmp_formula = '=IF(SUM({{{}}})<>0,AVERAGEIF({{{}}},"<>0"),0)'.format(cell, cell)
+            tmp_cell = tmp_formula.format(**A1_DICT)
+            worksheet.write(cur_row + 1, i, tmp_cell)
+
 workbook = xlsxwriter.Workbook('stocks.xlsx')
 records = [{'date': datetime.datetime.strptime('2013-01-23', '%Y-%m-%d'),
             'type': 'BUY',
