@@ -13,16 +13,21 @@ def build_worksheet(workbook, name, records):
         ('AMOUNT', ('Amount', None, '=SUM({AMOUNT})')),
         ('PRICE', ('Price paid', None)),
         ('FEES', ('Fees', None)),
-        ('TOTAL_PRICE', ('Total price', '={PRICE}*{AMOUNT}', '=SUM({TOTAL_PRICE})', '=IF(SUM({TOTAL_PRICE})<>0, AVERAGEIF({TOTAL_PRICE},"<>0"), 0)')),
-        ('TOTAL_W_FEE', ('Total price (+fee)', '={TOTAL_PRICE}+IF({TYPE}<>"CASH",{FEES},0)', '=SUM({TOTAL_W_FEE})', '=AVERAGEIF({TOTAL_W_FEE},"<>0")')),
+        ('TOTAL_PRICE', ('Total price', '={PRICE}*{AMOUNT}', '=SUM({TOTAL_PRICE})')),
+
+        ('TOTAL_W_FEE', ('Total price (+fee)', '={TOTAL_PRICE}+IF({TYPE}<>"CASH",{FEES},0)', '=SUM({TOTAL_W_FEE})', 'P.A. (-tax)')),
         ('DIV_YIELD', ('Dividend yield', '=IF({TYPE}<>"CASH", {TOTAL_DIVIDEND}/{AMOUNT} + IF({TYPE}="DIV", 0, {TOTAL_CASH}/{TOTAL_PRICE}), "")',
-                       '=(SUM({TOTAL_DIVIDEND})*SUM({PRICE})+SUM({TOTAL_CASH}))/{__TOT__TOTAL_W_FEE}')),
+                       '=(SUM({TOTAL_DIVIDEND})*SUM({PRICE})+SUM({TOTAL_CASH}))/{__TOT__TOTAL_W_FEE}',
+                      '=(({__TOT__DIV_YIELD} + 1) ^ (1/((TODAY()-MIN({DATE}))/365)) - 1)')),
         ('CAP_GAIN', ('Capital gain', '=IF({TYPE}<>"BUY","",({CURRENT_PRICE}-{PRICE})/{PRICE})',
-                      '=(SUM({CAPITAL_PRICE})-{__TOT__TOTAL_W_FEE})/{__TOT__TOTAL_PRICE}')),
+                      '=(SUM({CAPITAL_PRICE})-{__TOT__TOTAL_W_FEE})/{__TOT__TOTAL_PRICE}',
+                      '=(({__TOT__CAP_GAIN} + 1) ^ (1/((TODAY()-MIN({DATE}))/365)) - 1)')),
         ('GROSS_PROFIT', ('Gross profit', '=IF({TYPE}<>"BUY", "", (({AMOUNT}+{TOTAL_DIVIDEND})*{CURRENT_PRICE} - {TOTAL_PRICE} + {TOTAL_CASH})/{TOTAL_PRICE})',
-                          '=SUM({GROSS_GAIN})/{__TOT__TOTAL_PRICE}')),
+                          '=SUM({GROSS_GAIN})/{__TOT__TOTAL_PRICE}',
+                          '=(({__TOT__GROSS_PROFIT} + 1) ^ (1/((TODAY()-MIN({DATE}))/365)) - 1)')),
         ('NET_PROFIT', ('Net profit', '=IF({TYPE}<>"BUY", "", (({AMOUNT}+{TOTAL_DIVIDEND})* {CURRENT_PRICE}-{TOTAL_W_FEE}+{TOTAL_CASH})/{TOTAL_W_FEE})',
-                        '=SUM({NET_PROFIT})/{__TOT__TOTAL_W_FEE}')), # =((M11 + 1) ^ (1/((TODAY()-MIN($C2:$C8))/365)) - 1)
+                        '=SUM({NET_PROFIT})/{__TOT__TOTAL_W_FEE}',
+                        '=(({__TOT__NET_PROFIT} + 1) ^ (1/((TODAY()-MIN({DATE}))/365)) - 1)')),
         ('ANNUALIZED', ('Annual profit', '=IF({TYPE}<>"BUY","",(({NET_PROFIT}+1)^(1/((TODAY()-{DATE})/365))-1))',
                         '=SUM({ANNUALIZED})')), # =SUMPRODUCT(E2:E10,N2:N10)/SUMIF(D2:D10, "=BUY",E2:E10)
         ('TOTAL_VALUE', ('Total value', None)), # ={__TOT__AMOUNT} * SUM({PRICE})
@@ -101,11 +106,21 @@ def build_worksheet(workbook, name, records):
 
             if not cells[cell][2].startswith('='):
                 worksheet.write(cur_row + 1, i, 'Average')
-                continue
+            else:
+                tmp_formula = '=IF(SUM({{{}}})<>0,AVERAGEIF({{{}}},"<>0"),0)'.format(cell, cell)
+                tmp_cell = tmp_formula.format(**A1_DICT)
+                worksheet.write(cur_row + 1, i, tmp_cell)
 
-            tmp_formula = '=IF(SUM({{{}}})<>0,AVERAGEIF({{{}}},"<>0"),0)'.format(cell, cell)
-            tmp_cell = tmp_formula.format(**A1_DICT)
-            worksheet.write(cur_row + 1, i, tmp_cell)
+            if len(cells[cell]) > 3:
+                tmp_cell = cells[cell][3].format(**A1_DICT)
+                print(tmp_cell)
+                worksheet.write(cur_row + 2, i, tmp_cell)
+
+                if not cells[cell][3].startswith('='):
+                    worksheet.write(cur_row + 3, i, 'P.A. (+tax)')
+                else:
+                    worksheet.write(cur_row + 3, i, '={}/0.67'.format(xl_rowcol_to_cell(cur_row + 2, i)))
+
 
 workbook = xlsxwriter.Workbook('stocks.xlsx')
 records = [{'date': datetime.datetime.strptime('2013-01-23', '%Y-%m-%d'),
