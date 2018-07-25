@@ -62,6 +62,8 @@ def build_worksheet(workbook, name, records):
                                          'bg_color': 'black',
                                          'valign': 'vcenter'})
 
+    worksheet.set_column(0, len(order), 11)
+
     # Write header
     for i, key in enumerate(cells):
         worksheet.write(cur_row, i, cells[key][0], header_format)
