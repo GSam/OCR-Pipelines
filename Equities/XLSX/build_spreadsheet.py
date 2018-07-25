@@ -20,9 +20,9 @@ def build_worksheet(workbook, name, records):
         ('CAP_GAIN', ('Capital gain', '=IF({TYPE}<>"BUY","",({CURRENT_PRICE}-{PRICE})/{PRICE})',
                       '=(SUM({CAPITAL_PRICE})-{__TOT__TOTAL_W_FEE})/{__TOT__TOTAL_PRICE}')),
         ('GROSS_PROFIT', ('Gross profit', '=IF({TYPE}<>"BUY", "", (({AMOUNT}+{TOTAL_DIVIDEND})*{CURRENT_PRICE} - {TOTAL_PRICE} + {TOTAL_CASH})/{TOTAL_PRICE})',
-                          '={GROSS_GAIN}/{__TOT__TOTAL_PRICE}')),
+                          '=SUM({GROSS_GAIN})/{__TOT__TOTAL_PRICE}')),
         ('NET_PROFIT', ('Net profit', '=IF({TYPE}<>"BUY", "", (({AMOUNT}+{TOTAL_DIVIDEND})* {CURRENT_PRICE}-{TOTAL_W_FEE}+{TOTAL_CASH})/{TOTAL_W_FEE})',
-                        '={NET_PROFIT}/{__TOT__TOTAL_W_FEE}')), # =((M11 + 1) ^ (1/((TODAY()-MIN($C2:$C8))/365)) - 1)
+                        '=SUM({NET_PROFIT})/{__TOT__TOTAL_W_FEE}')), # =((M11 + 1) ^ (1/((TODAY()-MIN($C2:$C8))/365)) - 1)
         ('ANNUALIZED', ('Annual profit', '=IF({TYPE}<>"BUY","",(({NET_PROFIT}+1)^(1/((TODAY()-{DATE})/365))-1))',
                         '=SUM({ANNUALIZED})')), # =SUMPRODUCT(E2:E10,N2:N10)/SUMIF(D2:D10, "=BUY",E2:E10)
         ('TOTAL_VALUE', ('Total value', None)), # ={__TOT__AMOUNT} * SUM({PRICE})
