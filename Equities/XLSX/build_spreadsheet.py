@@ -134,12 +134,27 @@ def build_worksheet(workbook, name, records):
 
 
 workbook = xlsxwriter.Workbook('stocks.xlsx')
+
+vv = [dict(zip(['date', 'type', 'amount', 'price', 'fee'], [a.strip('$-') for a in x.split()])) for x in
+    '''13/01/14 BUY 300  $1.900      $10.00
+02/03/16    DIV 7    $-      $-
+01/06/16    BUY 500  $2.200      $10.00
+08/12/17    DIV 8   $-      $-'''.splitlines()]
+print vv
+for r in vv:
+    r['date'] = datetime.datetime.strptime(r['date'], '%d/%m/%y')
+    r['amount'] = int(r['amount'])
+    r['price'] = float(r['price']) if r['price'] else ''
+    r['fee'] = float(r['fee']) if r['fee'] else ''
+
 records = [{'date': datetime.datetime.strptime('2013-01-23', '%Y-%m-%d'),
             'type': 'BUY',
             'amount': 100,
             'price': 2.17,
             'fee': 30
            }]
+records = vv
+
 build_worksheet(workbook, 'FNZ', records)
 workbook.close()
 
